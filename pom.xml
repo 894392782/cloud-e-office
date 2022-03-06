@@ -9,6 +9,7 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>yeb-server</module>
+        <module>yeb-generator</module>
     </modules>
     <packaging>pom</packaging>
     <name>yeb</name>
