@@ -4,11 +4,13 @@ import com.xxxx.server.pojo.Admin;
 import com.xxxx.server.pojo.AdminLoginParam;
 import com.xxxx.server.pojo.ResBean;
 import com.xxxx.server.service.AdminService;
+import com.xxxx.server.service.impl.AdminServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,7 +27,7 @@ public class LoginController {
     private AdminService adminService;
     @ApiOperation(value = "登录之后返回token")
     @PostMapping("/login")
-    public ResBean login(AdminLoginParam adminLoginParam, HttpServletRequest request){
+    public ResBean login(@RequestBody AdminLoginParam adminLoginParam, HttpServletRequest request){
         return adminService.login(adminLoginParam.getUsername(),adminLoginParam.getPassword(),request);
     }
 
@@ -37,6 +39,7 @@ public class LoginController {
             return null;
         }
         String username = principal.getName();
+
         Admin admin = adminService.getAdminByUserName(username);
         admin.setPassword(null);
         return admin;

@@ -43,9 +43,6 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
     @Autowired
     private AdminMapper adminMapper;
 
-
-
-
     /**
      * 登录之后返回token
      * @param username
@@ -55,6 +52,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
      */
     @Override
     public ResBean login(String username, String password, HttpServletRequest request) {
+
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         if (null == userDetails || !passwordEncoder.matches(password,userDetails.getPassword())){
             return ResBean.error("用户名或密码不正确");
@@ -63,7 +61,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
             return ResBean.error("账号被禁用，请联系管理员");
         }
 
-
+        //更新Security登录用户对象
         UsernamePasswordAuthenticationToken authenticationToken = new
                 UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
@@ -73,6 +71,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         Map<String,Object> tokenMap = new HashMap<>();
         tokenMap.put("token",token);
         tokenMap.put("tokenHead",tokenHead);
+        System.out.println(token);
         return ResBean.success("登陆成功",tokenMap);
     }
 

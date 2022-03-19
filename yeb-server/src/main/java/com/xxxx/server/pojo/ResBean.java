@@ -34,7 +34,7 @@ public class ResBean {
      * @return
      */
     public static ResBean success(String message,Object obj){
-        return new ResBean(200,message,null);
+        return new ResBean(200,message,obj);
     }
 
     /**

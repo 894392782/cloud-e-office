@@ -20,10 +20,12 @@ public class RestAuthorizationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+        System.out.println(111);
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
         ResBean bean = ResBean.error("尚未登陆，请登录");
+        bean.setCode(401);
         out.write(new ObjectMapper().writeValueAsString(bean));
         out.flush();
         out.close();

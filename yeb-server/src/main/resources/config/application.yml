@@ -1,10 +1,13 @@
 server:
   port: 8081
 
+
 spring:
+  main:
+    allow-circular-references: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/yeb?characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://localhost:3306/yeb?characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: root
     password: Fuckyou123
     hikari:
@@ -30,5 +33,5 @@ logging:
 jwt:
   tokenHeader: Authorization
   secret: yeb-secret
-  expiration: 604800
+  expiration: 604800000
   tokenHead: Bearer
