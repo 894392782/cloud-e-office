@@ -1,10 +1,15 @@
 package com.xxxx.server.service.impl;
 
+import com.xxxx.server.pojo.Admin;
 import com.xxxx.server.pojo.Menu;
 import com.xxxx.server.mapper.MenuMapper;
 import com.xxxx.server.service.MenuService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -16,5 +21,15 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements MenuService {
-
+    @Autowired
+    private MenuMapper menuMapper;
+    /**
+     * 根据用户id获取菜单列表
+     * @return
+     */
+    @Override
+    public List<Menu> getMenusByAdminId() {
+        return menuMapper.getMenusByAdminId(((Admin) SecurityContextHolder.getContext().getAuthentication().getPrincipal()
+        ).getId());
+    }
 }

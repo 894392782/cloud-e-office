@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.xxxx.server.config.security.JwtTokenUtil;
 import com.xxxx.server.pojo.Admin;
 import com.xxxx.server.mapper.AdminMapper;
+import com.xxxx.server.pojo.Menu;
 import com.xxxx.server.pojo.ResBean;
 import com.xxxx.server.service.AdminService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -15,9 +16,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,6 +39,12 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    /**
+     * 通过用户id查询菜单列表
+     * @return
+     */
+
+
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
     @Value("${jwt.tokenHead}")
@@ -47,11 +56,17 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
      * 登录之后返回token
      * @param username
      * @param password
+     * @param code
      * @param request
      * @return
      */
     @Override
-    public ResBean login(String username, String password, HttpServletRequest request) {
+    public ResBean login(String username, String password, String code, HttpServletRequest request) {
+        //验证码
+        String captcha = (String) request.getSession().getAttribute("captcha");
+        if (StringUtils.isEmpty(code) || !captcha.equalsIgnoreCase(code)){
+            return ResBean.error("验证码输入错误，请重新输入");
+        }
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         if (null == userDetails || !passwordEncoder.matches(password,userDetails.getPassword())){
