@@ -1,9 +1,9 @@
-package com.xxxx.server.config.security;
+package com.xxxx.server.config.security.component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xxxx.server.pojo.ResBean;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
@@ -13,17 +13,19 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- * 当访问接口没有权限时，自定义返回结果
+ * 未登录或者token失效时访问接口时，自定义的返回结果
  */
 @Component
-public class RestfulAccessDenieHandler implements AccessDeniedHandler {
+public class RestAuthorizationEntryPoint implements AuthenticationEntryPoint {
+
     @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+        System.out.println(111);
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
-        ResBean bean = ResBean.error("权限不足，请联系管理员");
-        bean.setCode(403);
+        ResBean bean = ResBean.error("尚未登陆，请登录");
+        bean.setCode(401);
         out.write(new ObjectMapper().writeValueAsString(bean));
         out.flush();
         out.close();
