@@ -1,12 +1,24 @@
 package com.xxxx.server.controller;
 
 
+import cn.afterturn.easypoi.excel.ExcelExportUtil;
+import cn.afterturn.easypoi.excel.ExcelImportUtil;
+import cn.afterturn.easypoi.excel.entity.ExportParams;
+import cn.afterturn.easypoi.excel.entity.ImportParams;
+import cn.afterturn.easypoi.excel.entity.enmus.ExcelType;
 import com.xxxx.server.pojo.*;
 import com.xxxx.server.service.*;
 import io.swagger.annotations.ApiOperation;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -101,6 +113,66 @@ public class EmployeeController {
             return ResBean.success("删除成功！");
         }
         return ResBean.error("删除失败！");
+    }
+
+    @ApiOperation(value = "导出员工数据")
+    @GetMapping(value = "/export",produces = "application/octet-stream")
+    public void exportEmployee(HttpServletResponse httpServletResponse){
+        List<Employee> list = employeeService.getEmployee(null);
+        ExportParams params = new ExportParams("员工表","员工表",ExcelType.XSSF);
+        Workbook workbook = ExcelExportUtil.exportExcel(params, Employee.class, list);
+        ServletOutputStream outputStream = null;
+        try {
+            //流形式
+            httpServletResponse.setHeader("content-type", "application/octet-stream");
+            //防止中文乱码
+            httpServletResponse.setHeader("content-disposition", "attachment;filename=" + URLEncoder.encode("员工表.xls", "UTF-8"));
+            outputStream = httpServletResponse.getOutputStream();
+            workbook.write(outputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            if (null != outputStream){
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    @ApiOperation(value = "导入员工数据")
+    @PostMapping("/import")
+    public  ResBean importEmployee(MultipartFile file){
+        ImportParams params = new ImportParams();
+        params.setTitleRows(1);
+        List<Nation> nationList = nationService.list();
+        List<PoliticsStatus> politicsStatusList = politicsStatusService.list();
+        List<Department> departmentList = departmentService.list();
+        List<Position> positionList = positionService.list();
+        List<Joblevel> joblevelList = joblevelService.list();
+        try {
+            List<Employee> list = ExcelImportUtil.importExcel(file.getInputStream(), Employee.class, params);
+            list.forEach(employee -> {
+                employee.setPoliticId(politicsStatusList.get(politicsStatusList.indexOf
+                        (new PoliticsStatus(employee.getPoliticsStatus().getName()))).getId());
+                employee.setNationId
+                        (nationList.get(nationList.indexOf(new Nation(employee.getNation().getName()))).getId());
+                employee.setDepartmentId(departmentList.get
+                        (departmentList.indexOf(new Department(employee.getDepartment().getName()))).getId());
+                employee.setJobLevelId
+                        (joblevelList.get(joblevelList.indexOf(new Joblevel(employee.getJoblevel().getName()))).getId());
+                employee.setPosId
+                        (positionList.get(positionList.indexOf(new Position(employee.getPosition().getName()))).getId());
+            });
+            if (employeeService.saveBatch(list)){
+                return ResBean.success("导入成功!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ResBean.error("导入失败!");
     }
 
 }
