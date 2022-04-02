@@ -1,5 +1,6 @@
 package com.xxxx.mail;
 
+import com.xxxx.server.pojo.MailConstants;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.amqp.core.Queue;
 import org.springframework.boot.SpringApplication;
@@ -18,6 +19,6 @@ public class MailApplication {
 
     @Bean
     public Queue queue(){
-        return new Queue("mail.welcome");
+        return new Queue(MailConstants.MAIL_QUEUE_NAME);
     }
 }
