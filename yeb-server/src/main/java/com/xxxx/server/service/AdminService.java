@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.xxxx.server.pojo.Menu;
 import com.xxxx.server.pojo.ResBean;
 import com.xxxx.server.pojo.Role;
+import org.springframework.security.core.Authentication;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -56,4 +57,22 @@ public interface AdminService extends IService<Admin> {
      * @return
      */
     ResBean updateAdminRole(Integer adminId, Integer[] rids);
+
+    /**
+     * 更新用户密码
+     * @param oldPass
+     * @param pass
+     * @param adminId
+     * @return
+     */
+    ResBean updateAdminPassword(String oldPass, String pass, Integer adminId);
+
+    /**
+     * 更新头像
+     * @param url
+     * @param id
+     * @param authentication
+     * @return
+     */
+    ResBean updateAdminUserFace(String url, Integer id, Authentication authentication);
 }

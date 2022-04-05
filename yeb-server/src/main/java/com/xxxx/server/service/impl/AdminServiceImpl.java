@@ -1,7 +1,7 @@
 package com.xxxx.server.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.xxxx.server.AdminUtils;
+import com.xxxx.server.utils.AdminUtils;
 import com.xxxx.server.config.security.component.JwtTokenUtil;
 import com.xxxx.server.mapper.AdminRoleMapper;
 import com.xxxx.server.mapper.RoleMapper;
@@ -15,9 +15,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -142,5 +144,47 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
             return ResBean.success("更新成功!");
         }
         return ResBean.error("更新失败!");
+    }
+
+    /**
+     * 更新用户密码
+     * @param oldPass
+     * @param pass
+     * @param adminId
+     * @return
+     */
+    @Override
+    public ResBean updateAdminPassword(String oldPass, String pass, Integer adminId) {
+        Admin admin = adminMapper.selectById(adminId);
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        if(encoder.matches(oldPass,admin.getPassword())){
+            admin.setPassword(encoder.encode(pass));
+            int res = adminMapper.updateById(admin);
+            if (res == 1){
+                return ResBean.success("更新成功！");
+            }
+        }
+        return ResBean.error("更新失败!");
+    }
+
+    /**
+     * 更新头像
+     * @param url
+     * @param id
+     * @param authentication
+     * @return
+     */
+    @Override
+    public ResBean updateAdminUserFace(String url, Integer id, Authentication authentication) {
+        Admin admin = adminMapper.selectById(id);
+        int res = adminMapper.updateById(admin);
+        if (res == 1){
+            Admin principal = (Admin) authentication.getPrincipal();
+            principal.setUserFace(url);
+            SecurityContextHolder.getContext().setAuthentication
+                    (new UsernamePasswordAuthenticationToken(admin,null,authentication.getAuthorities()));
+            return ResBean.success("更新成功！",url);
+        }
+        return ResBean.error("更新失败！");
     }
 }

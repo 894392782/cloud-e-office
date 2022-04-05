@@ -8,15 +8,16 @@ spring:
   rabbitmq:
     username: guest
     password: guest
-    host: 192.168.181.128
+    host: 178.128.118.184
     port: 5672
     publisher-confirm-type: correlated
     publisher-returns: true
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/yeb?characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://178.128.118.184/yeb?characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: root
-    password: Fuckyou123
+    password: Fuck1you!
     hikari:
       pool-name: DateHikariCP
       minimum-idle: 5
@@ -28,7 +29,7 @@ spring:
       connection-test-query: SELECT 1
   redis:
     timeout: 10000ms
-    host: 192.168.181.128
+    host: 178.128.118.184
     port: 6379
     database: 0
     lettuce:
@@ -52,5 +53,5 @@ logging:
 jwt:
   tokenHeader: Authorization
   secret: yeb-secret
-  expiration: 604800000
+  expiration: 60480000
   tokenHead: Bearer

@@ -31,9 +31,16 @@ public class RabbitMQConfig {
     @Bean
     public RabbitTemplate rabbitTemplate(){
         RabbitTemplate rabbitTemplate = new RabbitTemplate(cachingConnectionFactory);
+        /**
+         * 消息确认回调，确认消息是否到达 broken
+         * data : 消息唯一标识
+         * ack : 确认结果 布尔类型
+         * cause : 失败原因
+         */
         rabbitTemplate.setConfirmCallback((data,ack,cause) ->{
             String msgId = data.getId();
             if (ack){
+                System.out.println("{}=========>消息发送成功");
                 LOGGER.info("{}=========>消息发送成功",msgId);
                 mailLogService.update(new UpdateWrapper<MailLog>().set("status",1).eq("msgId",msgId));
             }else {
@@ -41,7 +48,12 @@ public class RabbitMQConfig {
             }
         });
         /**
-         * 消息失败回调
+         * 消息失败回调，比如 router 不到 queue 时回调
+         * msg : 消息主题
+         * repCode : 响应码
+         * repText: 相应描述
+         * exchange: 交换机
+         * routingkey : 路由键
          */
         rabbitTemplate.setReturnCallback((msg,repCode,repText,exchange,routingKey) -> {
             LOGGER.error("{}============>消息发送queue失败",msg.getBody());
