@@ -39,6 +39,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         ValueOperations<String,Object> valueOperations = redisTemplate.opsForValue();
         List<Menu> menus = (List<Menu>) valueOperations.get("menu_" + adminId);
         if (CollectionUtils.isEmpty(menus)){
+            System.out.println(adminId);
             menus = menuMapper.getMenusByAdminId(adminId);
             valueOperations.set("menu_"+adminId,menus);
         }

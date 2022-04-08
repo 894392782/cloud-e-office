@@ -29,8 +29,15 @@ public class CaptchaController {
     @ApiOperation(value = "验证码")
     @GetMapping(value = "/captcha",produces = "image/jpg")
     private void captcha(HttpServletRequest request, HttpServletResponse response){
+        String origin = request.getHeader("Origin");
         response.setDateHeader("Expires",0);
+        response.setHeader("Set-Cookie", "JSESSIONID=xxx;SameSite=None;Secure");
         response.setHeader("Cache-Control","no-store,no-cache,must-revalidate");
+        response.setHeader("Access-Control-Allow-Origin", origin);
+        response.setHeader("Access-Control-Allow-Methods", "*");
+        response.setHeader("Access-Control-Allow-Headers", "*");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setHeader("Access-Control-Max-Age", "3600");
         response.addHeader("Cache-Control","post-check=0,pre-check=0");
         response.setHeader("Pragma","no-cache");
         response.setContentType("image/jpeg");

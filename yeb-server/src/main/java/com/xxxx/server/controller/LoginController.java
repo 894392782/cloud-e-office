@@ -25,6 +25,19 @@ public class LoginController {
 
     @Autowired
     private AdminService adminService;
+
+//    @ApiOperation(value = "重定向到login")
+//    @PostMapping("/")
+//    public String redirect(@RequestBody AdminLoginParam adminLoginParam, HttpServletRequest request){
+//        return "forward:/login";
+//    }
+    @ApiOperation(value = "登录之后返回token2")
+    @PostMapping("/")
+        public ResBean login2(@RequestBody AdminLoginParam adminLoginParam, HttpServletRequest request){
+        return adminService.login(adminLoginParam.getUsername(),adminLoginParam.getPassword(),adminLoginParam.getCode(),request);
+    }
+
+
     @ApiOperation(value = "登录之后返回token")
     @PostMapping("/login")
     public ResBean login(@RequestBody AdminLoginParam adminLoginParam, HttpServletRequest request){

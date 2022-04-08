@@ -81,7 +81,7 @@
           AND
             mr.rid = ar.rid
           AND
-            ar.adminId = 4
+            ar.adminId = #{id}
           AND
             m2.enabled = TRUE
     </select>

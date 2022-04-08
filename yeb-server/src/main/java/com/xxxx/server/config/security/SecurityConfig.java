@@ -18,6 +18,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -40,6 +45,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers(
+                "/*",
+                "/",
                 "/login",
                 "/logout",
                 "/css/*",
@@ -58,10 +65,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         //使用jwt不需要csrf
-        http.csrf()
+        http.cors()
+                .configurationSource(corsConfigurationSource())
+                .and()
+                .csrf()
                 .disable()
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                //.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
 //                //允许登陆访问
@@ -81,12 +91,38 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .headers()
                 .cacheControl();
+        //http.cors().configurationSource(corsConfigurationSource());
         //过滤器
         http.addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         //添加自定义未授权未登录结果返回
         http.exceptionHandling()
                 .accessDeniedHandler(restfulAccessDenieHandler)
                 .authenticationEntryPoint(restAuthorizationEntryPoint);
+    }
+    @Bean
+    CorsConfigurationSource corsConfigurationSource(){
+//        CorsConfiguration corsConfiguration=new CorsConfiguration();
+//        corsConfiguration.setAllowedHeaders(Arrays.asList("*"));
+//        corsConfiguration.setAllowedMethods(Arrays.asList("*"));
+//        corsConfiguration.setAllowedOrigins(Arrays.asList("http://178.128.118.184","http://157.230.43.126"));
+//        corsConfiguration.setAllowCredentials(true);
+//        corsConfiguration.setMaxAge(3600L);
+//        UrlBasedCorsConfigurationSource source=new UrlBasedCorsConfigurationSource();
+//        //所有的请求都允许跨域
+//        source.registerCorsConfiguration("/**",corsConfiguration);
+//        return  source;
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("http://157.230.43.126");
+        configuration.addAllowedOrigin("http://178.128.118.184");
+        configuration.addAllowedOrigin("http://178.128.118.184:8081");
+        configuration.addAllowedOrigin("http://157.230.43.126:8080");//修改为添加而不是设置，* 最好改为实际的需要，我这是非生产配置，所以粗暴了一点
+        configuration.addAllowedMethod("*");//修改为添加而不是设置
+        configuration.addAllowedHeader("*");//这里很重要，起码需要允许 Access-Control-Allow-Origin
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+
     }
 
     @Override

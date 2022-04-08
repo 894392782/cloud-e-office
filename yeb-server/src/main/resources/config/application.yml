@@ -1,6 +1,9 @@
 server:
   port: 8081
-
+  servlet:
+    session: .
+      cookie:
+        secure: false
 
 spring:
   main:
@@ -29,7 +32,7 @@ spring:
       connection-test-query: SELECT 1
   redis:
     timeout: 10000ms
-    host: 178.128.118.184
+    host: 127.0.0.1
     port: 6379
     database: 0
     lettuce:
